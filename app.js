@@ -15,6 +15,8 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+const corsHeader = require("./middleware/cors");
+app.use(corsHeader);
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
