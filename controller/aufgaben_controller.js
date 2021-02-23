@@ -1,4 +1,6 @@
 const Aufgabe=require('../modells/aufgaben_model')
+const { validationResult } = require('express-validator')
+const createError = require('http-errors')
 
 
 //GET ************************************
@@ -15,12 +17,12 @@ const aufgabenGetController = (req,res,next) => {
 //POST ************************************
 const aufgabenPostController= async(req,res,next) =>{
     try {
-        // const errors = validationResult(req)
-        // if (!errors.isEmpty()) {
-        //     return res.status(422).json({
-        //         fehlerBeiValidierung: errors.array()
-        //     })
-        // }
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            return res.status(422).json({
+                fehlerBeiValidierung: errors.array()
+            })
+        }
         aufnahme = new Aufgabe(req.body)
         await aufnahme.save()
         res.status(200).send(aufnahme)
@@ -31,20 +33,21 @@ const aufgabenPostController= async(req,res,next) =>{
 }
 
 // DELETE **********************************
-const aufgabenDelController= (req,res,next) =>{
-    const {_id} = req.params
+const aufgabenDelController=async(req,res,next) =>{
 
-    if(!_id){
-        res.status(422).send('weiß nicht welche Aufgabe ich löschen soll. ID fehlt')
+    try {
+		const { _id } = req.params;
+		let antwort = await Aufgabe.deleteOne({ _id})
+		if (antwort.deletedCount > 0) {
+			res.status(200).send('erfolgreich gelöscht')
+		} else {
+			res.send('Es gab keinen Eintrag zum Löschen!')
+		}
+	} catch (error) {
+		let fehler = createError(404, `Konnte die Aufnahme mit dem ID ${req.params.id}  nicht löschen`)
+		next(fehler)
     }
-
-    Aufgabe.deleteOne({_id},(fehler,ergebnis)=>{
-        if (fehler) {
-            res.status(500).send("Fehler beim Löschen: " + fehler);
-        } else {
-            res.status(200).send(ergebnis);
-        }
-    })
+    
 }
 
 module.exports={aufgabenGetController,aufgabenPostController,aufgabenDelController}
