@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { check }  = require('express-validator')
-const {aufgabenGetController,aufgabenPostController,aufgabenDelController}=require('../controller/aufgaben_controller')
+const auth = require('../middleware/auth')
+const {aufgabenGetController,aufgabenPostController,aufgabenDelController,erledigen}=require('../controller/aufgaben_controller')
 
 const validAufgabe = [
     check('inhalt')
@@ -9,18 +10,19 @@ const validAufgabe = [
       .isEmpty()
       .withMessage('Aufgabe muss angegeben werden.')
       .trim(),
-      check ("datum","bitte geben Sie hier Datum!")
+    check ("datum","bitte geben Sie hier Datum!")
       .not()
       .isEmpty()
-      .isISO8601() 
-
-
+      .isISO8601(),
+    check('erledig')
+      .optional()
+      .isBoolean() 
 ]
 
 router
     .route('/')
-     .get(aufgabenGetController)
-     .post(validAufgabe,aufgabenPostController)
+     .get(auth,aufgabenGetController)
+     .post(auth,validAufgabe,aufgabenPostController)
      .delete((res, req, next) => {
 		res.status(422).send("DELETE braucht eine ID im URL-Segment")
 	})
@@ -28,6 +30,9 @@ router
 router
     .route('/:_id')
     .delete(aufgabenDelController)
+
+router
+    .route('/erledigt').get(auth,erledigen)
 
 
 module.exports = router

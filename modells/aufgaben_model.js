@@ -5,7 +5,9 @@ const { Schema } = mongoose;
 
 const Aufgabe = new Schema({
     inhalt : String,
-    datum: Date
+    datum: Date,
+    erledig:Boolean,
+    userid:String
    
     
 });

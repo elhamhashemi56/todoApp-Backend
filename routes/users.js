@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { check }  = require('express-validator')
-const auth = require('../middleware/auth')
+
 
 
 const {userGetController,
@@ -14,11 +14,6 @@ const validUser = [
     .not()
     .isEmpty()
     .withMessage('Vorname muss angegeben werden.')
-    .trim(),
-  check('nachname')
-    .not()
-    .isEmpty()
-    .withMessage('Nachname muss angegeben werden.')
     .trim(),
   check('email')
     .isEmail()

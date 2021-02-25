@@ -4,14 +4,16 @@ const createError = require('http-errors')
 
 
 //GET ************************************
-const aufgabenGetController = (req,res,next) => {
-    Aufgabe.find((err,docs)=>{
-        if(err){
-            res.status(500).send('Fehler bei GET auf /Record/:' +err)
-        }else{
-            res.status(200).send(docs)
-        }
-   })
+const aufgabenGetController = async(req,res,next) => {
+    
+    try{
+        let userAufgaben=await Aufgabe.find({userid :req.tokenNutzer.userId})
+        res.status(200).send(userAufgaben)
+    }catch(error){
+        console.log(error);
+        let nachricht=createError(404,'du kannst nicht diese aufgabe laden')
+        next(nachricht)
+    }
 }
 
 //POST ************************************
@@ -24,6 +26,7 @@ const aufgabenPostController= async(req,res,next) =>{
             })
         }
         aufnahme = new Aufgabe(req.body)
+        aufnahme.userid=req.tokenNutzer.userId
         await aufnahme.save()
         res.status(200).send(aufnahme)
         
@@ -50,4 +53,17 @@ const aufgabenDelController=async(req,res,next) =>{
     
 }
 
-module.exports={aufgabenGetController,aufgabenPostController,aufgabenDelController}
+//ERLEDIGEN ************************************
+const erledigen = async(req,res,next) => {
+    
+    try{
+        let userAufgaben=await Aufgabe.find({erledig:true})
+        res.status(200).send(userAufgaben)
+    }catch(error){
+        console.log(error);
+        let nachricht=createError(404,'du kannst nicht diese aufgabe laden')
+        next(nachricht)
+    }
+}
+
+module.exports={aufgabenGetController,aufgabenPostController,aufgabenDelController,erledigen}
