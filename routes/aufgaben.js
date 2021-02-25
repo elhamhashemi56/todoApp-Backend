@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { check }  = require('express-validator')
 const auth = require('../middleware/auth')
-const {aufgabenGetController,aufgabenPostController,aufgabenDelController,erledigen}=require('../controller/aufgaben_controller')
+const {aufgabenGetController,aufgabenPostController,aufgabenDelController,aufgabenPutController,erledigen}=require('../controller/aufgaben_controller')
 
 const validAufgabe = [
     check('inhalt')
@@ -30,6 +30,8 @@ router
 router
     .route('/:_id')
     .delete(aufgabenDelController)
+    .put(auth,aufgabenPutController)
+    
 
 router
     .route('/erledigt').get(auth,erledigen)
